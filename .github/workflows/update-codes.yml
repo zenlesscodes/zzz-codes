@@ -1,0 +1,95 @@
+name: Update ZZZ Codes Info
+
+on:
+  schedule:
+    # Run every hour at minute 5
+    - cron: '5 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch codes info from API
+        id: fetch
+        run: |
+          # Fetch from the live API
+          RESPONSE=$(curl -s --fail --max-time 30 "https://zenlesscodes.com/api/codes" || echo '{}')
+          
+          # Extract values using jq
+          POLYCHROMES=$(echo "$RESPONSE" | jq -r '.total_polychromes // 0')
+          CODES_COUNT=$(echo "$RESPONSE" | jq -r '.codes | length // 0')
+          TIMESTAMP=$(echo "$RESPONSE" | jq -r '.generated_at // "Unknown"')
+          
+          # Export for next step
+          echo "polychromes=$POLYCHROMES" >> $GITHUB_OUTPUT
+          echo "codes_count=$CODES_COUNT" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+
+      - name: Update README.md
+        run: |
+          POLYCHROMES="${{ steps.fetch.outputs.polychromes }}"
+          CODES_COUNT="${{ steps.fetch.outputs.codes_count }}"
+          TIMESTAMP="${{ steps.fetch.outputs.timestamp }}"
+          
+          cat > README.md << 'HEREDOC'
+          # 🎮 Zenless Zone Zero Codes
+
+          [![Update Status](https://github.com/${{ github.repository }}/actions/workflows/update-codes.yml/badge.svg)](https://github.com/${{ github.repository }}/actions/workflows/update-codes.yml)
+
+          **All active ZZZ redemption codes, auto-updated every hour.**
+
+          ---
+
+          ## 💎 Currently Available
+
+          | 🎁 Active Codes | 💎 Total Polychromes |
+          |:---------------:|:--------------------:|
+          | **CODES_COUNT** | **POLYCHROMES** |
+
+          > 📅 Last checked: `TIMESTAMP`
+
+          ---
+
+          ## 🔗 Get The Codes
+
+          **👉 [zenlesscodes.com](https://zenlesscodes.com) — View all codes with copy buttons and redeem redirects**
+
+          ---
+
+          ## ⚡ Features
+
+          - ⏰ Auto-updates every hour via GitHub Actions
+          - 🔍 Aggregates from multiple verified sources
+          - ✅ Only shows confirmed active codes
+          - 💎 Tracks total available Polychromes
+
+          ---
+
+          *Unofficial fan project. Zenless Zone Zero © HoYoverse.*
+          HEREDOC
+          
+          # Replace placeholders with actual values
+          sed -i "s/POLYCHROMES/$POLYCHROMES/g" README.md
+          sed -i "s/CODES_COUNT/$CODES_COUNT/g" README.md
+          sed -i "s/TIMESTAMP/$TIMESTAMP/g" README.md
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🔄 Update: ${{ steps.fetch.outputs.codes_count }} codes, ${{ steps.fetch.outputs.polychromes }} Polychromes"
+            git push
+          fi
