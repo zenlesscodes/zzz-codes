@@ -18,7 +18,9 @@
 
 ## 🔗 Get The Codes
 
-**👉 [zenlesscodes.com](https://zenlesscodes.com) — View all codes with copy buttons and redeem redirects**
+**👉 [zenlesscodes.com](https://zenlesscodes.com) — View all codes with copy buttons**
+
+📱 **Redeem:** [HoYoverse Redemption Page](https://zenless.hoyoverse.com/redemption)
 
 ---
 
