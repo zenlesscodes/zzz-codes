@@ -33,15 +33,16 @@ jobs:
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
 
       - name: Update README.md
+        env:
+          POLYCHROMES: ${{ steps.fetch.outputs.polychromes }}
+          CODES_COUNT: ${{ steps.fetch.outputs.codes_count }}
+          TIMESTAMP: ${{ steps.fetch.outputs.timestamp }}
+          REPO: ${{ github.repository }}
         run: |
-          POLYCHROMES="${{ steps.fetch.outputs.polychromes }}"
-          CODES_COUNT="${{ steps.fetch.outputs.codes_count }}"
-          TIMESTAMP="${{ steps.fetch.outputs.timestamp }}"
-          
-          cat > README.md << 'HEREDOC'
+          cat > README.md << EOF
           # 🎮 Zenless Zone Zero Codes
 
-          [![Update Status](https://github.com/${{ github.repository }}/actions/workflows/update-codes.yml/badge.svg)](https://github.com/${{ github.repository }}/actions/workflows/update-codes.yml)
+          [![Update Status](https://github.com/${REPO}/actions/workflows/update-codes.yml/badge.svg)](https://github.com/${REPO}/actions/workflows/update-codes.yml)
 
           **All active ZZZ redemption codes, auto-updated every hour.**
 
@@ -51,15 +52,17 @@ jobs:
 
           | 🎁 Active Codes | 💎 Total Polychromes |
           |:---------------:|:--------------------:|
-          | **CODES_COUNT** | **POLYCHROMES** |
+          | **${CODES_COUNT}** | **${POLYCHROMES}** |
 
-          > 📅 Last checked: `TIMESTAMP`
+          > 📅 Last checked: \`${TIMESTAMP}\`
 
           ---
 
           ## 🔗 Get The Codes
 
-          **👉 [zenlesscodes.com](https://zenlesscodes.com) — View all codes with copy buttons and redeem redirects**
+          **👉 [zenlesscodes.com](https://zenlesscodes.com) — View all codes with copy buttons**
+
+          📱 **Redeem:** [HoYoverse Redemption Page](https://zenless.hoyoverse.com/redemption)
 
           ---
 
@@ -73,12 +76,7 @@ jobs:
           ---
 
           *Unofficial fan project. Zenless Zone Zero © HoYoverse.*
-          HEREDOC
-          
-          # Replace placeholders with actual values
-          sed -i "s/POLYCHROMES/$POLYCHROMES/g" README.md
-          sed -i "s/CODES_COUNT/$CODES_COUNT/g" README.md
-          sed -i "s/TIMESTAMP/$TIMESTAMP/g" README.md
+          EOF
 
       - name: Commit and push if changed
         run: |
