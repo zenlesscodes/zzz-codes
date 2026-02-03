@@ -3,7 +3,7 @@ name: Update ZZZ Codes Info
 on:
   schedule:
     # Run every hour at minute 5
-    - cron: '5 * * * *'
+    - cron: '38 * * * *'
   workflow_dispatch: # Allow manual trigger
 
 # SAFETY #1: Prevents pile-ups. 
