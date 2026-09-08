@@ -5,8 +5,8 @@
 ## 💎 Currently Available
 | 🎁 Active Codes | 💎 Total Polychromes |
 |:---------------:|:--------------------:|
-| **5** | **160** |
-> 📅 Last checked: `2026-09-08 14:44:14 UTC`
+| **2** | **50** |
+> 📅 Last checked: `2026-09-08 18:44:14 UTC`
 ---
 ## 🔗 Get The Codes
 **👉 [zenlesscodes.com](https://zenlesscodes.com) — View all codes with copy buttons**
